@@ -13,7 +13,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "settings",
-        lazy: () => import("./routes/settings/SettingsRoute"),
+        lazy: () => import("./routes/register/RegisterRoute.tsx"),
         handle: createCrumb("Settings", "/settings"),
       },
       {

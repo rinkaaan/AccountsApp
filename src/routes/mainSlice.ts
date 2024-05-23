@@ -1,9 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { FlashbarProps } from "@cloudscape-design/components"
-import { shortUuid, uuid } from "../common/typedUtils"
+import { uuid } from "../common/typedUtils"
 import type { RootState } from "../common/reducers"
 import { ReactNode } from "react"
-import Cookies from "js-cookie"
 
 export interface MainState {
   navigationOpen: boolean;
@@ -13,8 +12,8 @@ export interface MainState {
   toolsHidden: boolean;
   toolsOpen: boolean;
   tools: ReactNode;
-  username: string;
-  userId: string;
+  email: string;
+  password: string;
 }
 
 const initialState: MainState = {
@@ -25,8 +24,8 @@ const initialState: MainState = {
   toolsHidden: true,
   toolsOpen: false,
   tools: null,
-  username: Cookies.get("username") || "Anonymous",
-  userId: shortUuid(),
+  email: "",
+  password: "",
 }
 
 type Notification = Pick<FlashbarProps.MessageDefinition, "type" | "content">

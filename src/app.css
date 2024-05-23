@@ -1,0 +1,7 @@
+button {
+    user-select: none;
+}
+
+html, body {
+    overscroll-behavior-y: none;
+}

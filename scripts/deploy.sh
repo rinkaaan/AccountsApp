@@ -1,9 +1,9 @@
 source ~/startup.sh
-WORKPLACE="$HOME/workplace/Transcribe"
+WORKPLACE="$HOME/workplace/Accounts"
 
-WORKSPACE="$WORKPLACE/TranscribeApp"
+WORKSPACE="$WORKPLACE/AccountsApp"
 (
   cd "$WORKSPACE"
-  rsync-project Transcribe
-  ssh root@hetzner "cd ~/workplace/Transcribe/TranscribeApp && npm run build"
+  rsync-project Accounts
+  ssh root@hetzner "cd ~/workplace/Accounts/AccountsApp && npm run build"
 )

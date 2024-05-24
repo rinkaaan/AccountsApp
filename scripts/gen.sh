@@ -1,14 +1,7 @@
-WORKPLACE="$HOME/workplace/Transcribe"
+WORKPLACE="$HOME/workplace/Accounts"
 
-WORKSPACE="$WORKPLACE/TranscribeApi"
-
-(
-  cd "$WORKSPACE"
-  ./scripts/gen.sh
-)
-
-WORKSPACE="$WORKPLACE/TranscribeApp"
-SCHEMA_PATH="$WORKPLACE/TranscribeApi/api/openapi.yaml"
+WORKSPACE="$WORKPLACE/AccountsApp"
+SCHEMA_PATH="http://localhost:8080/openapi.json"
 
 (
   cd "$WORKSPACE"

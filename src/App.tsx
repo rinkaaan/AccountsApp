@@ -12,32 +12,24 @@ const router = createBrowserRouter([
     errorElement: <MainLayoutError />,
     children: [
       {
-        path: "settings",
+        path: "/",
         lazy: () => import("./routes/register/RegisterRoute.tsx"),
-        handle: createCrumb("Settings", "/settings"),
+      },
+      {
+        path: "/verify",
+        lazy: () => import("./routes/verify/VerifyRoute.tsx"),
+      },
+      {
+        path: "/complete",
+        lazy: () => import("./routes/complete/CompleteRoute.tsx"),
       },
       {
         path: "*",
-        Component: () => <Navigate to="/settings" />,
+        Component: () => <Navigate to="/" />,
       },
     ],
   },
 ])
-
-export interface CrumbHandle {
-  crumbs: () => { crumb: string, path: string }
-}
-
-function createCrumb(crumb: string, path: string): CrumbHandle {
-  return {
-    crumbs: () => {
-      return {
-        crumb,
-        path,
-      }
-    },
-  }
-}
 
 export default function App() {
   return (

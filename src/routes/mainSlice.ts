@@ -14,6 +14,7 @@ export interface MainState {
   tools: ReactNode;
   email: string;
   password: string;
+  verificationCode: string;
 }
 
 const initialState: MainState = {
@@ -26,6 +27,7 @@ const initialState: MainState = {
   tools: null,
   email: "",
   password: "",
+  verificationCode: "",
 }
 
 type Notification = Pick<FlashbarProps.MessageDefinition, "type" | "content">

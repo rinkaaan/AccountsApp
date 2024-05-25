@@ -19,25 +19,26 @@ export function Component() {
           >Next</Button>
         }
       >
-        <SpaceBetween size="l">
-          <Container header={<Header variant="h2">Verify your email</Header>}>
-            <form onSubmit={(e) => e.preventDefault()}>
-              <SpaceBetween size="s">
-                <FormField label="Verification code">
-                  <Input
-                    value={verificationCode}
-                    onChange={({ detail }) => {
-                      appDispatch(mainActions.updateSlice({ verificationCode: detail.value }))
-                    }}
-                    autoFocus
-                    placeholder="Enter value"
-                    type="email"
-                  />
-                </FormField>
-              </SpaceBetween>
-            </form>
-          </Container>
-        </SpaceBetween>
+        <Container header={<Header variant="h2">Verify your email</Header>}>
+          <form onSubmit={(e) => e.preventDefault()}>
+            <SpaceBetween size="s">
+              <FormField
+                label="Verification code"
+                description="We've sent a verification code to your email address. Please enter it below."
+              >
+                <Input
+                  value={verificationCode}
+                  onChange={({ detail }) => {
+                    appDispatch(mainActions.updateSlice({ verificationCode: detail.value }))
+                  }}
+                  autoFocus
+                  placeholder="Enter value"
+                  type="email"
+                />
+              </FormField>
+            </SpaceBetween>
+          </form>
+        </Container>
       </Form>
     </ContentLayout>
   )

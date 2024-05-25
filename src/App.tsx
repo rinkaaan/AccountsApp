@@ -4,12 +4,17 @@ import MainLayoutError from "./routes/MainLayoutError"
 import "@cloudscape-design/global-styles/index.css"
 import "./app.css"
 import { Fragment } from "react"
+import { OpenAPI } from "../openapi-client"
 
 const router = createBrowserRouter([
   {
     path: "/",
     Component: MainLayout,
     errorElement: <MainLayoutError />,
+    loader: async () => {
+      OpenAPI.BASE = import.meta.env.VITE_API_URL
+      return null
+    },
     children: [
       {
         path: "/",

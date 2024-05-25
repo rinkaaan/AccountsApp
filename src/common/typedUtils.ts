@@ -1,8 +1,8 @@
 import { format, isToday, isYesterday, parseISO } from "date-fns"
 import { v4 } from "uuid"
 import Cookies from "js-cookie"
-import { createAsyncThunk } from "@reduxjs/toolkit"
-import store from "./store.ts"
+import { isFulfilled, isPending, isRejected } from "@reduxjs/toolkit"
+import { getActionName } from "./utils"
 
 export function formatDate(inputDate?: string) {
   if (!inputDate) return null
@@ -67,15 +67,6 @@ export async function translate(text: string, sourceLang: string = "auto", targe
   }
 }
 
-export const scrollToBottom = createAsyncThunk("common/scrollToBottom", async () => {
-  const { autoScroll } = store.getState().transcribe
-  if (!autoScroll) return
-  window.scroll({
-    top: document.body.scrollHeight,
-    behavior: "smooth",
-  })
-})
-
 export interface SelectItem {
   label: string
   value: string
@@ -91,5 +82,34 @@ export function getJsonCookie(cookieName: string): any {
 
 export function setJsonCookie(cookieName: string, value: any, options?: any) {
   Cookies.set(cookieName, JSON.stringify(value), options ?? { expires: 365 })
+}
+
+export function matchValidationFailedError(action: any) {
+  return action.type.endsWith("rejected") && action.payload?.status === 400 && action.payload?.body?.validationErrors !== undefined
+}
+
+export function getValidationErrors(action: any): Record<string, string> {
+  return action.payload.body.validationErrors
+}
+
+export function addCommonMatchers(builder) {
+  builder
+    .addMatcher(
+      (action) => matchValidationFailedError(action),
+      (state, action: any) => {
+        const validationErrors = getValidationErrors(action)
+        Object.assign(state.errorMessages, validationErrors)
+      },
+    )
+    .addMatcher(isPending, (state, action) => {
+      state.errorMessages = {}
+      state.asyncStatus[getActionName(action)] = "pending"
+    })
+    .addMatcher(isRejected, (state, action) => {
+      state.asyncStatus[getActionName(action)] = "rejected"
+    })
+    .addMatcher(isFulfilled, (state, action) => {
+      state.asyncStatus[getActionName(action)] = "fulfilled"
+    })
 }
 

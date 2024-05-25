@@ -1,10 +1,14 @@
 import { Button, Container, ContentLayout, Form, FormField, Header, Input, SpaceBetween } from "@cloudscape-design/components"
 import { useSelector } from "react-redux"
-import { mainActions, mainSelector } from "../mainSlice.ts"
+import { createUser, mainActions, mainSelector } from "../mainSlice.ts"
 import { appDispatch } from "../../common/store.ts"
 
 export function Component() {
-  const { email, password } = useSelector(mainSelector)
+  const { email, username, password, errorMessages, asyncStatus } = useSelector(mainSelector)
+
+  async function handleSubmit() {
+    await appDispatch(createUser({ email, username, password }))
+  }
 
   return (
     <ContentLayout
@@ -16,6 +20,8 @@ export function Component() {
         actions={
           <Button
             variant="primary"
+            onClick={handleSubmit}
+            loading={asyncStatus.createUser === "pending"}
           >Next</Button>
         }
       >
@@ -23,7 +29,7 @@ export function Component() {
           <Container header={<Header variant="h2">Create an account</Header>}>
             <form onSubmit={(e) => e.preventDefault()}>
               <SpaceBetween size="s">
-                <FormField label="Email address">
+                <FormField label="Email address" errorText={errorMessages.email}>
                   <Input
                     value={email}
                     onChange={({ detail }) => {
@@ -34,7 +40,16 @@ export function Component() {
                     type="email"
                   />
                 </FormField>
-                <FormField label="Password">
+                <FormField label="Username" errorText={errorMessages.username}>
+                  <Input
+                    value={username}
+                    onChange={({ detail }) => {
+                      appDispatch(mainActions.updateSlice({ username: detail.value }))
+                    }}
+                    placeholder="Enter value"
+                  />
+                </FormField>
+                <FormField label="Password" errorText={errorMessages.password}>
                   <Input
                     value={password}
                     onChange={({ detail }) => {

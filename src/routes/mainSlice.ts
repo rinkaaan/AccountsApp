@@ -1,8 +1,9 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { FlashbarProps } from "@cloudscape-design/components"
-import { uuid } from "../common/typedUtils"
+import { addCommonMatchers, AsyncStatus, uuid } from "../common/typedUtils"
 import type { RootState } from "../common/reducers"
 import { ReactNode } from "react"
+import { CreateUserRequest, UserControllerService } from "../../openapi-client"
 
 export interface MainState {
   navigationOpen: boolean;
@@ -13,8 +14,11 @@ export interface MainState {
   toolsOpen: boolean;
   tools: ReactNode;
   email: string;
+  username: string;
   password: string;
   verificationCode: string;
+  errorMessages: Record<string, string>;
+  asyncStatus: Record<string, AsyncStatus>;
 }
 
 const initialState: MainState = {
@@ -25,9 +29,12 @@ const initialState: MainState = {
   toolsHidden: true,
   toolsOpen: false,
   tools: null,
+  username: "",
   email: "",
   password: "",
   verificationCode: "",
+  errorMessages: {},
+  asyncStatus: {},
 }
 
 type Notification = Pick<FlashbarProps.MessageDefinition, "type" | "content">
@@ -54,9 +61,23 @@ export const mainSlice = createSlice({
     },
     resetSlice: () => {
       return initialState
-    }
+    },
+  },
+  extraReducers: (builder) => {
+    addCommonMatchers(builder)
   },
 })
+
+export const createUser = createAsyncThunk(
+  "main/createUser",
+  async (payload: CreateUserRequest, { rejectWithValue }) => {
+    try {
+      await UserControllerService.create(payload)
+    } catch (error) {
+      return rejectWithValue(error)
+    }
+  },
+)
 
 export const mainReducer = mainSlice.reducer
 export const mainActions = mainSlice.actions

@@ -53,6 +53,14 @@ const router = createBrowserRouter([
             path: "",
             lazy: () => import("./routes/reset-password/EnterEmailRoute.tsx"),
           },
+          {
+            path: "verify",
+            lazy: () => import("./routes/reset-password/VerifyRoute.tsx"),
+          },
+          {
+            path: "complete",
+            lazy: () => import("./routes/reset-password/CompleteRoute.tsx"),
+          }
         ],
       },
       {

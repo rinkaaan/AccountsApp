@@ -52,7 +52,7 @@ export function Component() {
                     <Input
                       value={usernameOrEmail}
                       onChange={({ detail }) => {
-                        appDispatch(mainActions.updateSlice({ usernameOrEmail: detail.value }))
+                        appDispatch(mainActions.updateSlice({ usernameOrEmail: detail.value, notifications: [] }))
                       }}
                       placeholder="Enter value"
                     />
@@ -64,7 +64,7 @@ export function Component() {
                     <Input
                       value={password}
                       onChange={({ detail }) => {
-                        appDispatch(mainActions.updateSlice({ password: detail.value }))
+                        appDispatch(mainActions.updateSlice({ password: detail.value, notifications: [] }))
                       }}
                       placeholder="Enter value"
                       type="password"

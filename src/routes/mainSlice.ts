@@ -3,7 +3,7 @@ import { FlashbarProps } from "@cloudscape-design/components"
 import { addCommonMatchers, AsyncStatus, uuid } from "../common/typedUtils"
 import type { RootState } from "../common/reducers"
 import { ReactNode } from "react"
-import { CreateUserRequest, LoginUserRequest, ResendVerificationEmailRequest, UserControllerService, VerifyUserRequest } from "../../openapi-client"
+import { CreateUserRequest, LoginUserRequest, ResendVerificationEmailRequest, ResetPasswordRequest, UserControllerService, VerifyUserRequest } from "../../openapi-client"
 
 export interface MainState {
   navigationOpen: boolean;
@@ -104,10 +104,12 @@ export const verifyUser = createAsyncThunk(
 
 export const resendVerification = createAsyncThunk(
   "main/resendVerification",
-  async (payload: ResendVerificationEmailRequest, { dispatch, rejectWithValue }) => {
+  async (payload: ResendVerificationEmailRequest & { includeNotification?: boolean }, { dispatch, rejectWithValue }) => {
     try {
       await UserControllerService.resendVerification(payload)
-      dispatch(mainActions.addNotification({ type: "success", content: "Verification code resent" }))
+      if (payload.includeNotification) {
+        dispatch(mainActions.addNotification({ type: "success", content: "Verification code resent" }))
+      }
     } catch (error) {
       return rejectWithValue(error)
     }
@@ -119,6 +121,18 @@ export const loginUser = createAsyncThunk(
   async (payload: LoginUserRequest, { dispatch, rejectWithValue }) => {
     try {
       const { jwtToken } = await UserControllerService.login(payload)
+      dispatch(mainActions.updateSlice({ jwtToken }))
+    } catch (error) {
+      return rejectWithValue(error)
+    }
+  },
+)
+
+export const resetPassword = createAsyncThunk(
+  "main/resetPassword",
+  async (payload: ResetPasswordRequest, { rejectWithValue, dispatch }) => {
+    try {
+      const { jwtToken } = await UserControllerService.resetPassword(payload)
       dispatch(mainActions.updateSlice({ jwtToken }))
     } catch (error) {
       return rejectWithValue(error)

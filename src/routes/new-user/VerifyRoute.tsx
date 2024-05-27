@@ -5,6 +5,8 @@ import { appDispatch } from "../../common/store.ts"
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import Link from "@cloudscape-design/components/link"
+import { ResendVerificationEmailRequest } from "../../../openapi-client"
+import resetType = ResendVerificationEmailRequest.resetType
 
 export function Component() {
   const navigate = useNavigate()
@@ -21,7 +23,7 @@ export function Component() {
   }
 
   async function handleResendVerification() {
-    await appDispatch(resendVerification({ email }))
+    await appDispatch(resendVerification({ usernameOrEmail: email, resetType: resetType.NEW_ACCOUNT }))
   }
 
   useEffect(() => {
@@ -29,6 +31,10 @@ export function Component() {
       navigate("/new-user/complete")
     }
   }, [asyncStatus.verifyUser])
+
+  useEffect(() => {
+    appDispatch(mainActions.resetFields(["verificationCode"]))
+  }, [])
 
   return (
     <ContentLayout
@@ -51,7 +57,7 @@ export function Component() {
               <SpaceBetween size="s">
                 <FormField
                   label="Verification code"
-                  description="We've sent a verification code to your email address. Please enter it below."
+                  description="We've sent a verification code to your email address. Please wait up to 5 minutes for it to arrive and enter it below."
                 >
                   <Input
                     value={verificationCode}
@@ -60,7 +66,7 @@ export function Component() {
                     }}
                     autoFocus
                     placeholder="Enter value"
-                    type="email"
+                    type="number"
                   />
                 </FormField>
               </SpaceBetween>

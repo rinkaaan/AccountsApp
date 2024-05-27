@@ -18,13 +18,22 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/login",
-        lazy: () => import("./routes/login/LoginRoute.tsx"),
+        children: [
+          {
+            path: "",
+            lazy: () => import("./routes/login/LoginRoute.tsx"),
+          },
+          {
+            path: "complete",
+            lazy: () => import("./routes/login/CompleteRoute.tsx"),
+          },
+        ],
       },
       {
         path: "/new-user",
         children: [
           {
-            path: "register",
+            path: "",
             lazy: () => import("./routes/new-user/RegisterRoute.tsx"),
           },
           {
@@ -41,7 +50,7 @@ const router = createBrowserRouter([
         path: "/reset-password",
         children: [
           {
-            path: "enter-email",
+            path: "",
             lazy: () => import("./routes/reset-password/EnterEmailRoute.tsx"),
           },
         ],

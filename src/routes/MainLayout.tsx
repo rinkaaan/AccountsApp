@@ -1,5 +1,5 @@
 import { AppLayout, Flashbar } from "@cloudscape-design/components"
-import { Outlet, ScrollRestoration, useNavigate } from "react-router-dom"
+import { Outlet, ScrollRestoration, useLocation, useNavigate } from "react-router-dom"
 import { Fragment, useEffect } from "react"
 import { useSelector } from "react-redux"
 import { appDispatch } from "../common/store"
@@ -9,6 +9,7 @@ import { prepareNotifications } from "../common/storeUtils"
 
 export default function MainLayout() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { notifications, startingPath } = useSelector(mainSelector)
 
   useEffect(() => {
@@ -16,6 +17,10 @@ export default function MainLayout() {
       navigate(startingPath)
     }
   }, [navigate, startingPath])
+
+  useEffect(() => {
+    appDispatch(mainActions.resetSlice())
+  }, [location.pathname])
 
   useEffect(() => {
     appDispatch(mainActions.updateSlice({ navigationOpen: false }))

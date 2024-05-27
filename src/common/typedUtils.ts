@@ -3,6 +3,8 @@ import { v4 } from "uuid"
 import Cookies from "js-cookie"
 import { isFulfilled, isPending, isRejected } from "@reduxjs/toolkit"
 import { getActionName } from "./utils"
+import { ApiError } from "../../openapi-client"
+import { mainSlice } from "../routes/mainSlice.ts"
 
 export function formatDate(inputDate?: string) {
   if (!inputDate) return null
@@ -84,8 +86,20 @@ export function setJsonCookie(cookieName: string, value: any, options?: any) {
   Cookies.set(cookieName, JSON.stringify(value), options ?? { expires: 365 })
 }
 
+export function isValidationError(error: ApiError): boolean {
+  return error.status === 400 && error.body?.validationErrors !== undefined
+}
+
 export function matchValidationFailedError(action: any) {
-  return action.type.endsWith("rejected") && action.payload?.status === 400 && action.payload?.body?.validationErrors !== undefined
+  const error: ApiError = action.payload
+  if (!error) return false
+  return action.type.endsWith("rejected") && isValidationError(error)
+}
+
+export function matchGenericError(action: any) {
+  const error: ApiError = action.payload
+  if (!error) return false
+  return action.type.endsWith("rejected") && !isValidationError(error)
 }
 
 export function getValidationErrors(action: any): Record<string, string> {
@@ -99,6 +113,30 @@ export function addCommonMatchers(builder) {
       (state, action: any) => {
         const validationErrors = getValidationErrors(action)
         Object.assign(state.errorMessages, validationErrors)
+      },
+    )
+    .addMatcher(
+      (action) => matchGenericError(action),
+      (state, action: any) => {
+        const error: ApiError = action.payload
+        const body = error.body
+        let header: undefined | string = undefined
+        if (body?.status && body?.error) {
+          header = `Error ${body.status} - ${body.error}`
+        } else if (body?.error) {
+          header = body.error
+        } else if (body?.status) {
+          header = `Error ${body.status}`
+        }
+
+        mainSlice.caseReducers.addNotification(state, {
+          type: "error",
+          payload: {
+            type: "error",
+            header,
+            content: body?.message || "An error occurred",
+          }
+        })
       },
     )
     .addMatcher(isPending, (state, action) => {

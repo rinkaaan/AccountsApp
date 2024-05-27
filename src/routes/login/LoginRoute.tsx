@@ -1,24 +1,29 @@
 import { Button, Container, ContentLayout, Form, FormField, Header, Input, SpaceBetween, TextContent } from "@cloudscape-design/components"
 import { useSelector } from "react-redux"
-import { createUser, mainActions, mainSelector } from "../mainSlice.ts"
+import { loginUser, mainActions, mainSelector } from "../mainSlice.ts"
 import { appDispatch } from "../../common/store.ts"
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import CloudLink from "../../components/CloudLink.tsx"
+import BaseForm from "../../components/BaseForm.tsx"
 
 export function Component() {
   const navigate = useNavigate()
-  const { email, username, password, errorMessages, asyncStatus } = useSelector(mainSelector)
+  const { usernameOrEmail, password, errorMessages, asyncStatus } = useSelector(mainSelector)
 
   async function handleSubmit() {
-    await appDispatch(createUser({ email, username, password }))
+    await appDispatch(loginUser({ usernameOrEmail, password }))
   }
 
   useEffect(() => {
-    if (asyncStatus.createUser === "fulfilled") {
-      navigate("/verify")
+    if (asyncStatus.loginUser === "fulfilled") {
+      navigate("/login/complete")
     }
-  }, [asyncStatus.createUser])
+  }, [asyncStatus.loginUser])
+
+  useEffect(() => {
+    appDispatch(mainActions.resetFields(["usernameOrEmail", "password"]))
+  }, [])
 
   return (
     <ContentLayout
@@ -31,23 +36,23 @@ export function Component() {
           <Button
             variant="primary"
             onClick={handleSubmit}
-            loading={asyncStatus.createUser === "pending"}
+            loading={asyncStatus.loginUser === "pending"}
           >Login</Button>
         }
       >
         <SpaceBetween size="l">
           <Container header={<Header variant="h2">Login</Header>}>
             <SpaceBetween size="l">
-              <form onSubmit={(e) => e.preventDefault()}>
+              <BaseForm handleSubmit={handleSubmit}>
                 <SpaceBetween size="s">
                   <FormField
                     label="Email or username"
-                    errorText={errorMessages.username}
+                    errorText={errorMessages.usernameOrEmail}
                   >
                     <Input
-                      value={username}
+                      value={usernameOrEmail}
                       onChange={({ detail }) => {
-                        appDispatch(mainActions.updateSlice({ username: detail.value }))
+                        appDispatch(mainActions.updateSlice({ usernameOrEmail: detail.value }))
                       }}
                       placeholder="Enter value"
                     />
@@ -66,9 +71,9 @@ export function Component() {
                     />
                   </FormField>
                 </SpaceBetween>
-              </form>
+              </BaseForm>
               <SpaceBetween size="s">
-                <CloudLink href="/reset-password/enter-email">Forgot password?</CloudLink>
+                <CloudLink href="/reset-password">Forgot password?</CloudLink>
                 <SpaceBetween
                   size="s"
                   direction="horizontal"
@@ -77,7 +82,7 @@ export function Component() {
                   <TextContent>
                     <p>Don't have an account?</p>
                   </TextContent>
-                  <CloudLink href="/new-user/register">Register</CloudLink>
+                  <CloudLink href="/new-user">Register</CloudLink>
                 </SpaceBetween>
               </SpaceBetween>
             </SpaceBetween>

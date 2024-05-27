@@ -24,9 +24,9 @@ export function Component() {
         // }
       >
         <SpaceBetween size="l">
-          <Container header={<Header variant="h2">Registration complete</Header>}>
+          <Container header={<Header variant="h2">Login complete</Header>}>
             <TextContent>
-              <p>Thank you for registering.</p>
+              <p>You are now logged in.</p>
             </TextContent>
           </Container>
         </SpaceBetween>

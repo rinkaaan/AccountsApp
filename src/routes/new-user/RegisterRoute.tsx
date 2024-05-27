@@ -5,6 +5,7 @@ import { appDispatch } from "../../common/store.ts"
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import CloudButton from "../../components/CloudButton.tsx"
+import BaseForm from "../../components/BaseForm.tsx"
 
 export function Component() {
   const navigate = useNavigate()
@@ -16,9 +17,13 @@ export function Component() {
 
   useEffect(() => {
     if (asyncStatus.createUser === "fulfilled") {
-      navigate("/verify")
+      navigate("/new-user/verify")
     }
   }, [asyncStatus.createUser])
+
+  useEffect(() => {
+    appDispatch(mainActions.resetFields(["email", "username", "password"]))
+  }, [])
 
   return (
     <ContentLayout
@@ -43,9 +48,12 @@ export function Component() {
       >
         <SpaceBetween size="l">
           <Container header={<Header variant="h2">Create an account</Header>}>
-            <form onSubmit={(e) => e.preventDefault()}>
+            <BaseForm handleSubmit={handleSubmit}>
               <SpaceBetween size="s">
-                <FormField label="Email address" errorText={errorMessages.email}>
+                <FormField
+                  label="Email address"
+                  errorText={errorMessages.email}
+                >
                   <Input
                     value={email}
                     onChange={({ detail }) => {
@@ -56,7 +64,10 @@ export function Component() {
                     type="email"
                   />
                 </FormField>
-                <FormField label="Username" errorText={errorMessages.username}>
+                <FormField
+                  label="Username"
+                  errorText={errorMessages.username}
+                >
                   <Input
                     value={username}
                     onChange={({ detail }) => {
@@ -65,7 +76,10 @@ export function Component() {
                     placeholder="Enter value"
                   />
                 </FormField>
-                <FormField label="Password" errorText={errorMessages.password}>
+                <FormField
+                  label="Password"
+                  errorText={errorMessages.password}
+                >
                   <Input
                     value={password}
                     onChange={({ detail }) => {
@@ -76,7 +90,7 @@ export function Component() {
                   />
                 </FormField>
               </SpaceBetween>
-            </form>
+            </BaseForm>
           </Container>
         </SpaceBetween>
       </Form>

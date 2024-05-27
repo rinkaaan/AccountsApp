@@ -3,7 +3,7 @@ import { FlashbarProps } from "@cloudscape-design/components"
 import { addCommonMatchers, AsyncStatus, uuid } from "../common/typedUtils"
 import type { RootState } from "../common/reducers"
 import { ReactNode } from "react"
-import { CreateUserRequest, UserControllerService } from "../../openapi-client"
+import { CreateUserRequest, LoginUserRequest, ResendVerificationEmailRequest, UserControllerService, VerifyUserRequest } from "../../openapi-client"
 
 export interface MainState {
   navigationOpen: boolean;
@@ -16,7 +16,9 @@ export interface MainState {
   email: string;
   username: string;
   password: string;
+  usernameOrEmail: string;
   verificationCode: string;
+  jwtToken?: string;
   errorMessages: Record<string, string>;
   asyncStatus: Record<string, AsyncStatus>;
 }
@@ -32,12 +34,14 @@ const initialState: MainState = {
   username: "",
   email: "",
   password: "",
+  usernameOrEmail: "",
   verificationCode: "",
+  jwtToken: undefined,
   errorMessages: {},
   asyncStatus: {},
 }
 
-type Notification = Pick<FlashbarProps.MessageDefinition, "type" | "content">
+type Notification = Pick<FlashbarProps.MessageDefinition, "type" | "content" | "header">
 
 export const mainSlice = createSlice({
   name: "main",
@@ -59,9 +63,16 @@ export const mainSlice = createSlice({
     removeNotification(state, action: PayloadAction<string>) {
       state.notifications = state.notifications.filter(n => n.id !== action.payload)
     },
-    resetSlice: () => {
-      return initialState
+    resetSlice: (state) => {
+      state.errorMessages = {}
+      state.notifications = []
+      state.asyncStatus = {}
     },
+    resetFields: (state, action: PayloadAction<Array<string>>) => {
+      action.payload.forEach(field => {
+        state[field] = initialState[field]
+      })
+    }
   },
   extraReducers: (builder) => {
     addCommonMatchers(builder)
@@ -73,6 +84,42 @@ export const createUser = createAsyncThunk(
   async (payload: CreateUserRequest, { rejectWithValue }) => {
     try {
       await UserControllerService.create(payload)
+    } catch (error) {
+      return rejectWithValue(error)
+    }
+  },
+)
+
+export const verifyUser = createAsyncThunk(
+  "main/verifyUser",
+  async (payload: VerifyUserRequest, { dispatch, rejectWithValue }) => {
+    try {
+      const { jwtToken } = await UserControllerService.verify(payload)
+      dispatch(mainActions.updateSlice({ jwtToken }))
+    } catch (error) {
+      return rejectWithValue(error)
+    }
+  },
+)
+
+export const resendVerification = createAsyncThunk(
+  "main/resendVerification",
+  async (payload: ResendVerificationEmailRequest, { dispatch, rejectWithValue }) => {
+    try {
+      await UserControllerService.resendVerification(payload)
+      dispatch(mainActions.addNotification({ type: "success", content: "Verification code resent" }))
+    } catch (error) {
+      return rejectWithValue(error)
+    }
+  },
+)
+
+export const loginUser = createAsyncThunk(
+  "main/loginUser",
+  async (payload: LoginUserRequest, { dispatch, rejectWithValue }) => {
+    try {
+      const { jwtToken } = await UserControllerService.login(payload)
+      dispatch(mainActions.updateSlice({ jwtToken }))
     } catch (error) {
       return rejectWithValue(error)
     }

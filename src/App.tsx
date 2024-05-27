@@ -17,20 +17,42 @@ const router = createBrowserRouter([
     },
     children: [
       {
+        path: "/login",
+        lazy: () => import("./routes/login/LoginRoute.tsx"),
+      },
+      {
+        path: "/new-user",
+        children: [
+          {
+            path: "register",
+            lazy: () => import("./routes/new-user/RegisterRoute.tsx"),
+          },
+          {
+            path: "verify",
+            lazy: () => import("./routes/new-user/VerifyRoute.tsx"),
+          },
+          {
+            path: "complete",
+            lazy: () => import("./routes/new-user/CompleteRoute.tsx"),
+          },
+        ],
+      },
+      {
+        path: "/reset-password",
+        children: [
+          {
+            path: "enter-email",
+            lazy: () => import("./routes/reset-password/EnterEmailRoute.tsx"),
+          },
+        ],
+      },
+      {
         path: "/",
-        lazy: () => import("./routes/register/RegisterRoute.tsx"),
-      },
-      {
-        path: "/verify",
-        lazy: () => import("./routes/verify/VerifyRoute.tsx"),
-      },
-      {
-        path: "/complete",
-        lazy: () => import("./routes/complete/CompleteRoute.tsx"),
+        Component: () => <Navigate to="/login" />,
       },
       {
         path: "*",
-        Component: () => <Navigate to="/" />,
+        Component: () => <Navigate to="/login" />,
       },
     ],
   },

@@ -2,9 +2,18 @@ import { Button, Container, ContentLayout, Form, FormField, Header, Input, Space
 import { useSelector } from "react-redux"
 import { mainActions, mainSelector } from "../mainSlice.ts"
 import { appDispatch } from "../../common/store.ts"
+import { useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
 export function Component() {
-  const { verificationCode } = useSelector(mainSelector)
+  const navigate = useNavigate()
+  const { verificationCode, email } = useSelector(mainSelector)
+
+  useEffect(() => {
+    if (!email) {
+      navigate("/login")
+    }
+  }, [email])
 
   return (
     <ContentLayout

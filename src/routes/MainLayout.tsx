@@ -10,7 +10,7 @@ import { prepareNotifications } from "../common/storeUtils"
 export default function MainLayout() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { notifications, startingPath } = useSelector(mainSelector)
+  const { notifications, startingPath, jwtToken } = useSelector(mainSelector)
 
   useEffect(() => {
     if (startingPath) {
@@ -21,6 +21,14 @@ export default function MainLayout() {
   useEffect(() => {
     appDispatch(mainActions.resetSlice())
   }, [location.pathname])
+
+  useEffect(() => {
+    if (jwtToken) {
+      if (window.opener) {
+        window.opener.postMessage(jwtToken, "*")
+      }
+    }
+  }, [jwtToken])
 
   useEffect(() => {
     appDispatch(mainActions.updateSlice({ navigationOpen: false }))

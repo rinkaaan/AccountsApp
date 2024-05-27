@@ -23,7 +23,7 @@ export function Component() {
   return (
     <ContentLayout
       header={
-        <Header variant="h1">Rikagu</Header>
+        <Header variant="h1">Rinkagu</Header>
       }
     >
       <Form

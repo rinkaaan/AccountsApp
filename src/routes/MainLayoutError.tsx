@@ -24,7 +24,7 @@ export default function MainLayoutError() {
         }),
       )
     }
-    navigate("/transcribe", { replace: true })
+    navigate("/login", { replace: true })
   }, [error, navigate])
 
   return null
